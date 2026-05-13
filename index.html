@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>A Message For You 💕</title>
+<title>For You 💕</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
 
@@ -45,11 +45,11 @@ body{
   height:2px;
   background:white;
   border-radius:50%;
-
   animation:twinkle 3s infinite ease-in-out;
 }
 
 @keyframes twinkle{
+
   0%,100%{
     opacity:.2;
     transform:scale(1);
@@ -57,7 +57,7 @@ body{
 
   50%{
     opacity:1;
-    transform:scale(1.7);
+    transform:scale(1.8);
   }
 }
 
@@ -90,6 +90,7 @@ body{
 }
 
 @keyframes fadeUp{
+
   from{
     opacity:0;
     transform:translateY(30px);
@@ -163,6 +164,7 @@ body{
 }
 
 @keyframes ring{
+
   0%,100%{
     transform:scale(1);
     opacity:.4;
@@ -207,6 +209,7 @@ body{
 }
 
 @keyframes heartbeat{
+
   0%,100%{
     transform:scale(1);
   }
@@ -257,6 +260,7 @@ body{
 }
 
 @keyframes fadeMessage{
+
   from{
     opacity:0;
     transform:translateY(12px);
@@ -313,6 +317,7 @@ body{
 }
 
 @keyframes fall{
+
   from{
     transform:translateY(0) rotate(0deg);
     opacity:1;
@@ -361,8 +366,14 @@ canvas{
 
 <!-- AUDIO -->
 
-<audio id="bgMusic" loop preload="auto">
-  <source src="./gaaju-bomma.mp3" type="audio/mpeg">
+<audio
+  id="bgMusic"
+  src="./gaaju-bomma.mp3"
+  autoplay
+  loop
+  muted
+  playsinline
+  preload="auto">
 </audio>
 
 <!-- STARS -->
@@ -386,7 +397,7 @@ canvas{
   </div>
 
   <div class="title" id="title">
-    Sita 💕
+    My Love 💕
   </div>
 
   <div class="line"></div>
@@ -412,7 +423,7 @@ canvas{
   </div>
 
   <div class="hint" id="hint">
-    tap the heart ✦
+    touch anywhere to enable music ✦
   </div>
 
   <div class="counter" id="counter"></div>
@@ -420,6 +431,58 @@ canvas{
 </div>
 
 <script>
+
+/* AUDIO */
+
+const music =
+  document.getElementById('bgMusic');
+
+/* TRY AUTOPLAY */
+
+window.addEventListener('load', async ()=>{
+
+  try{
+
+    music.currentTime = 15;
+
+    await music.play();
+
+    console.log("Autoplay started");
+
+  }catch(err){
+
+    console.log("Autoplay blocked");
+  }
+});
+
+/* UNMUTE ON FIRST TOUCH */
+
+function unlockAudio(){
+
+  music.muted = false;
+
+  music.volume = 1;
+
+  document.removeEventListener(
+    'click',
+    unlockAudio
+  );
+
+  document.removeEventListener(
+    'touchstart',
+    unlockAudio
+  );
+}
+
+document.addEventListener(
+  'click',
+  unlockAudio
+);
+
+document.addEventListener(
+  'touchstart',
+  unlockAudio
+);
 
 /* MESSAGES */
 
@@ -471,13 +534,9 @@ const title =
 const hint =
   document.getElementById('hint');
 
-const music =
-  document.getElementById('bgMusic');
-
 /* STATES */
 
 let current = -1;
-let musicStarted = false;
 
 /* STARS */
 
@@ -631,25 +690,7 @@ animate();
 
 /* HEART CLICK */
 
-heart.addEventListener('click', async ()=>{
-
-  /* START MUSIC */
-
-  if(!musicStarted){
-
-    musicStarted = true;
-
-    music.currentTime = 15;
-
-    try{
-      await music.play();
-    }
-    catch(err){
-      console.log(err);
-    }
-  }
-
-  /* NEXT MESSAGE */
+heart.addEventListener('click',()=>{
 
   current++;
 
@@ -669,8 +710,6 @@ heart.addEventListener('click', async ()=>{
 
   counter.innerHTML =
     `${current+1} / ${messages.length}`;
-
-  /* PETALS */
 
   dropPetals(
     current === messages.length-1
@@ -698,7 +737,7 @@ heart.addEventListener('click', async ()=>{
     }
   }
 
-  /* FINAL MESSAGE */
+  /* FINAL */
 
   if(current === messages.length-1){
 
