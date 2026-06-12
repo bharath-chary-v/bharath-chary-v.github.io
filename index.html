@@ -17,7 +17,8 @@
 }
 
 body{
-  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:auto;
   min-height:100vh;
 
   display:flex;
@@ -26,8 +27,28 @@ body{
 
   font-family:'Cormorant Garamond', serif;
 
-  background:
-    radial-gradient(circle at top left,#39104a 0%,#120818 55%,#09050f 100%);
+  /* default — overwritten by JS daily theme */
+  background:#020805;
+
+  transition:background 2s ease;
+}
+
+/* slow ambient pulse behind everything */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:0;
+  opacity:.55;
+  background:inherit;
+  filter:blur(60px) saturate(1.4);
+  animation:ambientPulse 8s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+
+@keyframes ambientPulse{
+  from{ opacity:.3; transform:scale(1);   }
+  to  { opacity:.7; transform:scale(1.06);}
 }
 
 /* STARS */
@@ -61,14 +82,104 @@ body{
   }
 }
 
+/* WRAP */
+
+.page-wrap{
+  position:relative;
+  z-index:5;
+  width:90%;
+  max-width:540px;
+  padding:24px 0 40px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  align-items:center;
+}
+
+/* COUNTDOWN */
+
+.countdown-card{
+  width:100%;
+  padding:22px 20px 18px;
+  border-radius:22px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,180,200,.18);
+  text-align:center;
+  box-shadow:0 0 50px rgba(232,82,122,.14);
+  animation:fadeUp 1s ease;
+}
+
+.countdown-label{
+  font-size:9px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:rgba(255,180,200,.5);
+  font-family:'Cinzel', serif;
+  margin-bottom:14px;
+}
+
+.countdown-date-title{
+  font-size:17px;
+  color:#ffb3cc;
+  font-family:'Cinzel', serif;
+  letter-spacing:.1em;
+  margin-bottom:18px;
+}
+
+.countdown-units{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+
+.unit{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-width:58px;
+}
+
+.unit-num{
+  font-size:36px;
+  font-weight:500;
+  color:#ffb3cc;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.02em;
+  text-shadow:0 0 20px rgba(255,100,160,.5);
+}
+
+.unit-sep{
+  font-size:30px;
+  color:rgba(255,180,200,.3);
+  line-height:1;
+  align-self:flex-start;
+  padding-top:2px;
+  margin-top:0;
+}
+
+.unit-label{
+  font-size:8px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:rgba(255,180,200,.4);
+  font-family:'Cinzel', serif;
+  margin-top:6px;
+}
+
+/* arrived state */
+.countdown-arrived{
+  font-size:22px;
+  color:#ffb3cc;
+  font-style:italic;
+  padding:6px 0;
+}
+
 /* CARD */
 
 .card{
-  position:relative;
-  z-index:5;
-
-  width:90%;
-  max-width:540px;
+  width:100%;
 
   padding:45px 28px;
 
@@ -357,6 +468,14 @@ canvas{
   .card{
     padding:35px 20px;
   }
+
+  .unit-num{
+    font-size:28px;
+  }
+
+  .unit{
+    min-width:46px;
+  }
 }
 
 </style>
@@ -388,56 +507,198 @@ canvas{
 
 <canvas id="fireworks"></canvas>
 
-<!-- CARD -->
+<!-- PAGE WRAP -->
 
-<div class="card">
+<div class="page-wrap">
 
-  <div class="top">
-    a message for you
-  </div>
+  <!-- COUNTDOWN -->
 
-  <div class="title" id="title">
-    Sita 💕
-  </div>
+  <div class="countdown-card">
 
-  <div class="line"></div>
+    <div class="countdown-label">counting down to</div>
 
-  <div class="heart-wrap">
+    <div class="countdown-date-title" id="countdownTitle">June 16 ✦</div>
 
-    <div class="ring"></div>
+    <div id="countdownDisplay">
+      <div class="countdown-units">
 
-    <div class="ring ring2"></div>
+        <div class="unit">
+          <span class="unit-num" id="cd-days">--</span>
+          <span class="unit-label">days</span>
+        </div>
 
-    <button class="heart" id="heart">
-      ❤️
-    </button>
+        <div class="unit-sep">:</div>
 
-  </div>
+        <div class="unit">
+          <span class="unit-num" id="cd-hours">--</span>
+          <span class="unit-label">hours</span>
+        </div>
 
-  <div class="message-box">
+        <div class="unit-sep">:</div>
 
-    <div class="message" id="message">
-      Tap the heart to open a message made just for you…
+        <div class="unit">
+          <span class="unit-num" id="cd-mins">--</span>
+          <span class="unit-label">mins</span>
+        </div>
+
+        <div class="unit-sep">:</div>
+
+        <div class="unit">
+          <span class="unit-num" id="cd-secs">--</span>
+          <span class="unit-label">secs</span>
+        </div>
+
+      </div>
     </div>
 
   </div>
 
-  <div class="hint" id="hint">
-    touch anywhere to enable music ✦
-  </div>
+  <!-- CARD -->
 
-  <div class="counter" id="counter"></div>
+  <div class="card">
+
+    <div class="top">
+      a message for you
+    </div>
+
+    <div class="title" id="title">
+      Sita 💕
+    </div>
+
+    <div class="line"></div>
+
+    <div class="heart-wrap">
+
+      <div class="ring"></div>
+
+      <div class="ring ring2"></div>
+
+      <button class="heart" id="heart">
+        ❤️
+      </button>
+
+    </div>
+
+    <div class="message-box">
+
+      <div class="message" id="message">
+        Tap the heart to open a message made just for you…
+      </div>
+
+    </div>
+
+    <div class="hint" id="hint">
+      touch anywhere to enable music ✦
+    </div>
+
+    <div class="counter" id="counter"></div>
+
+  </div>
 
 </div>
 
 <script>
 
-/* AUDIO */
+/* ── DAILY BACKGROUNDS ───────────────────────────────── */
+
+const BACKGROUNDS = {
+  /* June 12 — emerald forest night */
+  12: `
+    radial-gradient(ellipse at 10% 90%,#0e6b35 0%,transparent 50%),
+    radial-gradient(ellipse at 88% 12%,#0a5a25 0%,transparent 48%),
+    radial-gradient(ellipse at 55% 50%,#06200f 0%,transparent 65%),
+    #020b05`,
+  /* June 13 — deep crimson wine */
+  13: `
+    radial-gradient(ellipse at 18% 28%,#7a0e24 0%,transparent 50%),
+    radial-gradient(ellipse at 82% 75%,#550818 0%,transparent 48%),
+    radial-gradient(ellipse at 50% 55%,#1e0308 0%,transparent 65%),
+    #0a0204`,
+  /* June 14 — cobalt midnight ocean */
+  14: `
+    radial-gradient(ellipse at 82% 18%,#0c2080 0%,transparent 50%),
+    radial-gradient(ellipse at 18% 82%,#081558 0%,transparent 48%),
+    radial-gradient(ellipse at 50% 50%,#040618 0%,transparent 65%),
+    #020310`,
+  /* June 15 — amber bonfire */
+  15: `
+    radial-gradient(ellipse at 28% 18%,#6b2800 0%,transparent 50%),
+    radial-gradient(ellipse at 75% 80%,#4a1800 0%,transparent 48%),
+    radial-gradient(ellipse at 50% 52%,#1c0900 0%,transparent 65%),
+    #0c0400`,
+  /* June 16 — THE DAY — vivid magenta bloom */
+  16: `
+    radial-gradient(ellipse at 50%  2%,#8a0a58 0%,transparent 45%),
+    radial-gradient(ellipse at 12% 95%,#600830 0%,transparent 50%),
+    radial-gradient(ellipse at 88% 60%,#6e0a3a 0%,transparent 45%),
+    radial-gradient(ellipse at 50% 52%,#200010 0%,transparent 65%),
+    #0c0008`,
+};
+
+function applyDailyBackground(){
+  const today = new Date();
+  const day   = today.getDate();
+  const month = today.getMonth(); /* 0-indexed → June = 5 */
+
+  let bg = BACKGROUNDS[12]; /* default */
+
+  if(month === 5 && BACKGROUNDS[day]){
+    bg = BACKGROUNDS[day];
+  }
+
+  document.body.style.background = bg;
+}
+
+applyDailyBackground();
+
+/* ── COUNTDOWN ──────────────────────────────────────── */
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function updateCountdown(){
+
+  const now    = new Date();
+  /* Target: June 16 of current year, midnight start of day */
+  const target = new Date(now.getFullYear(), 5, 16, 0, 0, 0);
+
+  /* If it's already past June 16 this year, aim for next year */
+  if(now >= target){
+
+    const display = document.getElementById('countdownDisplay');
+    display.innerHTML =
+      `<div class="countdown-arrived">🎉 It's June 16 — the day is here! 🎉</div>`;
+
+    /* also throw some auto-fireworks */
+    for(let i=0;i<6;i++){
+      setTimeout(()=>{
+        firework(
+          80 + Math.random()*(innerWidth-160),
+          80 + Math.random()*(innerHeight/2)
+        );
+      }, i*350);
+    }
+    return;
+  }
+
+  const diff    = target - now;
+  const days    = Math.floor(diff / 86400000);
+  const hours   = Math.floor((diff % 86400000) / 3600000);
+  const mins    = Math.floor((diff % 3600000)  / 60000);
+  const secs    = Math.floor((diff % 60000)    / 1000);
+
+  document.getElementById('cd-days').textContent  = pad(days);
+  document.getElementById('cd-hours').textContent = pad(hours);
+  document.getElementById('cd-mins').textContent  = pad(mins);
+  document.getElementById('cd-secs').textContent  = pad(secs);
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ── AUDIO ──────────────────────────────────────────── */
 
 const music =
   document.getElementById('bgMusic');
-
-/* TRY AUTOPLAY */
 
 window.addEventListener('load', async ()=>{
 
@@ -455,36 +716,20 @@ window.addEventListener('load', async ()=>{
   }
 });
 
-/* UNMUTE ON FIRST TOUCH */
-
 function unlockAudio(){
 
   music.muted = false;
 
   music.volume = 1;
 
-  document.removeEventListener(
-    'click',
-    unlockAudio
-  );
-
-  document.removeEventListener(
-    'touchstart',
-    unlockAudio
-  );
+  document.removeEventListener('click',     unlockAudio);
+  document.removeEventListener('touchstart',unlockAudio);
 }
 
-document.addEventListener(
-  'click',
-  unlockAudio
-);
+document.addEventListener('click',     unlockAudio);
+document.addEventListener('touchstart',unlockAudio);
 
-document.addEventListener(
-  'touchstart',
-  unlockAudio
-);
-
-/* MESSAGES */
+/* ── MESSAGES ───────────────────────────────────────── */
 
 const messages = [
 
@@ -514,116 +759,77 @@ const messages = [
 
 ];
 
-/* ELEMENTS */
+/* ── ELEMENTS ───────────────────────────────────────── */
 
-const heart =
-  document.getElementById('heart');
-
-const message =
-  document.getElementById('message');
-
-const counter =
-  document.getElementById('counter');
-
-const petals =
-  document.getElementById('petals');
-
-const title =
-  document.getElementById('title');
-
-const hint =
-  document.getElementById('hint');
-
-/* STATES */
+const heart   = document.getElementById('heart');
+const message = document.getElementById('message');
+const counter = document.getElementById('counter');
+const petals  = document.getElementById('petals');
+const title   = document.getElementById('title');
+const hint    = document.getElementById('hint');
 
 let current = -1;
 
-/* STARS */
+/* ── STARS ──────────────────────────────────────────── */
 
-const stars =
-  document.getElementById('stars');
+const stars = document.getElementById('stars');
 
 for(let i=0;i<100;i++){
 
-  const s =
-    document.createElement('div');
+  const s = document.createElement('div');
 
   s.className = 'star';
 
-  s.style.left =
-    Math.random()*100 + '%';
-
-  s.style.top =
-    Math.random()*100 + '%';
-
-  s.style.width =
-  s.style.height =
-    Math.random()*3 + 'px';
-
-  s.style.animationDelay =
-    Math.random()*4 + 's';
+  s.style.left   = Math.random()*100 + '%';
+  s.style.top    = Math.random()*100 + '%';
+  s.style.width  =
+  s.style.height = Math.random()*3 + 'px';
+  s.style.animationDelay = Math.random()*4 + 's';
 
   stars.appendChild(s);
 }
 
-/* PETALS */
+/* ── PETALS ─────────────────────────────────────────── */
 
 function dropPetals(count=8){
 
-  const icons = [
-    '🌸','💕','✨','🌹','💖','🌷'
-  ];
+  const icons = ['🌸','💕','✨','🌹','💖','🌷'];
 
   for(let i=0;i<count;i++){
 
-    const p =
-      document.createElement('div');
+    const p = document.createElement('div');
 
     p.className = 'petal';
 
-    p.innerHTML =
-      icons[Math.floor(Math.random()*icons.length)];
+    p.innerHTML = icons[Math.floor(Math.random()*icons.length)];
 
-    p.style.left =
-      Math.random()*100 + '%';
+    p.style.left = Math.random()*100 + '%';
 
-    p.style.fontSize =
-      14 + Math.random()*18 + 'px';
+    p.style.fontSize = 14 + Math.random()*18 + 'px';
 
-    p.style.setProperty(
-      '--x',
-      (Math.random()-.5)*200 + 'px'
-    );
+    p.style.setProperty('--x',(Math.random()-.5)*200 + 'px');
 
-    p.style.animationDuration =
-      3 + Math.random()*3 + 's';
+    p.style.animationDuration = 3 + Math.random()*3 + 's';
 
     petals.appendChild(p);
 
-    setTimeout(()=>{
-      p.remove();
-    },6000);
+    setTimeout(()=>{ p.remove(); },6000);
   }
 }
 
-/* FIREWORKS */
+/* ── FIREWORKS ──────────────────────────────────────── */
 
-const canvas =
-  document.getElementById('fireworks');
-
-const ctx =
-  canvas.getContext('2d');
+const canvas = document.getElementById('fireworks');
+const ctx    = canvas.getContext('2d');
 
 let particles = [];
 
 function resize(){
-
-  canvas.width = innerWidth;
+  canvas.width  = innerWidth;
   canvas.height = innerHeight;
 }
 
 resize();
-
 window.addEventListener('resize',resize);
 
 function firework(x,y){
@@ -631,15 +837,10 @@ function firework(x,y){
   for(let i=0;i<60;i++){
 
     particles.push({
-
-      x,
-      y,
-
+      x, y,
       vx:(Math.random()-.5)*8,
       vy:(Math.random()-.5)*8,
-
       alpha:1,
-
       size:2 + Math.random()*3
     });
   }
@@ -649,103 +850,61 @@ function animate(){
 
   requestAnimationFrame(animate);
 
-  ctx.clearRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  particles =
-    particles.filter(p=>p.alpha>0);
+  particles = particles.filter(p=>p.alpha>0);
 
   particles.forEach(p=>{
 
-    p.x += p.vx;
-    p.y += p.vy;
-
+    p.x  += p.vx;
+    p.y  += p.vy;
     p.vy += 0.03;
-
     p.alpha -= 0.015;
 
     ctx.globalAlpha = p.alpha;
 
     ctx.beginPath();
-
-    ctx.arc(
-      p.x,
-      p.y,
-      p.size,
-      0,
-      Math.PI*2
-    );
-
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
     ctx.fillStyle = '#ff78b0';
-
     ctx.fill();
   });
 }
 
 animate();
 
-/* HEART CLICK */
+/* ── HEART CLICK ────────────────────────────────────── */
 
 heart.addEventListener('click',()=>{
 
   current++;
 
-  if(current >= messages.length){
-    current = 0;
-  }
+  if(current >= messages.length){ current = 0; }
 
   message.style.animation = 'none';
-
   void message.offsetWidth;
+  message.innerHTML      = messages[current];
+  message.style.animation = 'fadeMessage .6s ease';
 
-  message.innerHTML =
-    messages[current];
+  counter.innerHTML = `${current+1} / ${messages.length}`;
 
-  message.style.animation =
-    'fadeMessage .6s ease';
+  dropPetals(current === messages.length-1 ? 18 : 8);
 
-  counter.innerHTML =
-    `${current+1} / ${messages.length}`;
-
-  dropPetals(
-    current === messages.length-1
-    ? 18
-    : 8
-  );
-
-  /* FIREWORKS */
-
-  if(
-    current % 3 === 2 ||
-    current === messages.length-1
-  ){
+  if(current % 3 === 2 || current === messages.length-1){
 
     for(let i=0;i<3;i++){
 
       setTimeout(()=>{
-
         firework(
           100 + Math.random()*(innerWidth-200),
           100 + Math.random()*(innerHeight/2)
         );
-
       },i*250);
     }
   }
 
-  /* FINAL */
-
   if(current === messages.length-1){
-
-    title.innerHTML =
-      "💌 With all my love";
-
-    hint.innerHTML =
-      "you mean everything to me ✦";
+    title.innerHTML = "💌 With all my love";
+    hint.innerHTML  = "you mean everything to me ✦";
   }
 
 });
